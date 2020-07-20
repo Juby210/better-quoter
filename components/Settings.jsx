@@ -40,7 +40,8 @@ module.exports = class Settings extends React.Component {
                         },
                         {
                             name: "Some Channel",
-                            id: getChannelId() || getLastSelectedChannelId()
+                            id: getChannelId() || getLastSelectedChannelId(),
+                            isDM: () => false
                         }
                     ))}
                 </div>
