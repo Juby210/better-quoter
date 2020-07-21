@@ -35,7 +35,7 @@
         "selector": "channel",
         "prop": "channel.name",
         "desc": "Used to get the name from channel where the message was send.",
-        "eval": "prop || channel.rawRecipients.length > 1 ? channel.rawRecipients.map(r => r.username).join(', ') : 'DM'"
+        "eval": "prop != '' ? prop : channel.rawRecipients.length > 1 ? channel.rawRecipients.map(r => r.username).join(', ') : 'DM'"
     },
     {
         "selector": "files",
