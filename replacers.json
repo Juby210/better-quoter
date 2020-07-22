@@ -1,12 +1,12 @@
 [
     {
         "selector": "msg",
-        "prop": "message.content",
+        "prop": "content",
         "desc": "Used to get the content from the message."
     },
     {
         "selector": "quote",
-        "prop": "message.content",
+        "prop": "content",
         "desc": "Used to get the content from the message, but already quoted in markdown.",
         "eval": "'> ' + prop.replace(/\\n/g, '\\n> ')"
     },

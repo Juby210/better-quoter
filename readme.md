@@ -5,4 +5,4 @@ Adds a button to the toolbar to Quote Someone & Patches the Original Quoter of D
 #### TODO
 - [ ] Quote full message group
 - [ ] Possibility to set more formats than one
-- [ ] Option to replace @ in mentions
+- [x] Option to replace @ in mentions

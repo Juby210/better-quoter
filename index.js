@@ -42,12 +42,37 @@ module.exports = class BetterQuoter extends Plugin {
     }
 
     parseMessage(message, channel) {
-        let text = this.settings.get('text', `> \`%name% - %time% in\` <#%channelId%>\n\`\`\`fix\n%msg%\n%files%\n\`\`\``)
+        const replaceMentions = this.settings.get("replaceMentions", 0)
+        let { content } = message
+        if (replaceMentions) {
+            const { getUser } = getModule(["getUser", "getCurrentUser"], false)
+            const { getGuild } = getModule(["getGuild"], false)
+            const guild = channel.guild_id && getGuild(channel.guild_id)
+            content = content.replace(/<@[!&]{0,1}([0-9]{10,})>/g, (string, match) => {
+                const user = getUser(match)
+                if (user) return this.formatMention(user)
+                const role = guild && guild.roles && guild.roles[match]
+                if (role) return this.formatMention(role, true)
+                return string
+            })
+        }
+        let text = this.settings.get("text", "> `%name% - %time%` in <#%channelid%>\n%quote%\n%files%")
         replacers.forEach(r => {
-            const prop = getProp({ message, channel }, r.prop)
-            text = text.replace(new RegExp(`%${r.selector}%`, 'g'), r.eval ? eval(r.eval) : prop)
+            const prop = getProp({ message, channel, content }, r.prop)
+            text = text.replace(new RegExp(`%${r.selector}%`, "g"), r.eval ? eval(r.eval) : prop)
         })
         return text
+    }
+    formatMention(target, role) {
+        const format = this.settings.get("replaceMentions", 0)
+        if (format == 1) {
+            if (role) return `\`@${target.name}\``
+            if (this.settings.get("showFullTagInMentions", true)) return `\`@${target.tag}\``
+            return `\`@${target.username}\``
+        }
+        if (role) return `\`@\`${target.name}`
+        if (this.settings.get("showFullTagInMentions", true)) return `\`@\`${target.tag}`
+        return `\`@\`${target.username}`
     }
 
     async insertText(content) {
