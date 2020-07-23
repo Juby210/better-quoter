@@ -1,7 +1,7 @@
 {
     "name": "BetterQuoter",
-    "description": "Adds a button to the toolbar to Quote Someone & Patches the Original Quoter of Discord. Fully Customizable.",
-    "version": "1.0.3",
+    "description": "The real better quoter for discord. Allows you to quote multiple messages & users at same time across channels or servers or just customize quote format.",
+    "version": "1.1.0",
     "author": "Strencher & Juby210",
     "license": "MIT"
 }

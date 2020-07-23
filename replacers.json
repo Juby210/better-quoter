@@ -8,7 +8,7 @@
         "selector": "quote",
         "prop": "content",
         "desc": "Used to get the content from the message, but already quoted in markdown.",
-        "eval": "'> ' + prop.replace(/\\n/g, '\\n> ')"
+        "eval": "prop != '' ? '> ' + prop.replace(/\\n/g, '\\n> ') : ''"
     },
     {
         "selector": "authorid",
@@ -36,6 +36,18 @@
         "prop": "channel.name",
         "desc": "Used to get the name from channel where the message was send.",
         "eval": "prop != '' ? prop : channel.rawRecipients.length > 1 ? channel.rawRecipients.map(r => r.username).join(', ') : 'DM'"
+    },
+    {
+        "selector": "server",
+        "prop": "guild.name",
+        "desc": "Used to get the name from guild where message was send.",
+        "eval": "prop ? prop : ''"
+    },
+    {
+        "selector": "serverid",
+        "prop": "guild.id",
+        "desc": "Used to get the id from guild where message was send.",
+        "eval": "prop ? prop : ''"
     },
     {
         "selector": "files",
