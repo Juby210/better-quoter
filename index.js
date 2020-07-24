@@ -47,18 +47,21 @@ module.exports = class BetterQuoter extends Plugin {
             })
             MiniPopover.default.displayName = "MiniPopover"
         }
+
+        inject("betterquoter-quote", getModule(["createQuotedText"], false), "createQuotedText", args => this.createQuote(args[0], args[1]))
+
         this.patch()
     }
 
     pluginWillUnload() {
         powercord.api.settings.unregisterSettings(this.entityID);
-        ["betterquoter-toolbar", "betterquoter-classic", "betterquoter-textarea", "betterquoter-textarea2", "betterquoter-send"].forEach(i => uninject(i))
+        ["betterquoter-toolbar", "betterquoter-quote", "betterquoter-textarea", "betterquoter-textarea-submit", "betterquoter-send"].forEach(i => uninject(i))
         if (this.subscribe) dispatcher.unsubscribe("BETTER_QUOTER_UPDATE2", this.subscribe)
     }
 
     async patch(repatch) {
-        if (repatch) ["betterquoter-classic", "betterquoter-textarea", "betterquoter-textarea2", "betterquoter-send"].forEach(i => uninject(i))
-        if (this.settings.get("classicMode")) return inject("betterquoter-classic", getModule(["createQuotedText"], false), "createQuotedText", args => this.parseMessage(...args))
+        if (repatch) ["betterquoter-textarea", "betterquoter-textarea-submit", "betterquoter-send"].forEach(i => uninject(i))
+        if (this.settings.get("classicMode")) return
         const ChannelTextAreaGuard = await getModuleByDisplayName("ChannelTextAreaGuard")
         inject("betterquoter-textarea", ChannelTextAreaGuard.prototype, "render", (_, res) => {
             const old = res.props.children
@@ -68,16 +71,16 @@ module.exports = class BetterQuoter extends Plugin {
         })
         const { serialize } = await getModule(["serialize", "serializeSelection"]), _this = this
         const SlateChannelTextArea = await getModuleByDisplayName("SlateChannelTextArea")
-        inject("betterquoter-textarea2", SlateChannelTextArea.prototype, "handleTabOrEnterDown", function (args) {
-            if (args[0].which == 13 && !args[0].shiftKey && !this.hasOpenPlainTextCodeBlock() && quotedUsers.length) {
-                args[0].preventDefault()
-                args[0].stopPropagation()
-                const content = _this.insertQuotes(serialize(this.props.value.document, "raw"))
-                if (content) this.props.onSubmit(content)
-                return false
+        inject("betterquoter-textarea-submit", SlateChannelTextArea.prototype, "handleTabOrEnterDown", function (_, submit) {
+            if (submit && quotedUsers.length) {
+                const serialized = serialize(this.props.value.document, "raw")
+                if (!serialized.trim()) {
+                    const content = _this.insertQuotes(serialized)
+                    if (content) this.props.onSubmit(content)
+                }
             }
-            return args
-        }, true)
+            return submit
+        })
         inject("betterquoter-send", messages, "sendMessage", args => {
             if (quotedUsers.length) {
                 const content = this.insertQuotes(args[1].content)
@@ -95,8 +98,9 @@ module.exports = class BetterQuoter extends Plugin {
         const quotes = this.createQuotes(quotedUsers)
         const ret = quotes + content
         if (ret.length > 2000) {
-            powercord.api.notices.sendToast("quoterError", { content: `Your quote is too long. Your'e ${ret.length - 2000} chars over the limit.`, timeout: 4000 })
-            setTimeout(() => powercord.api.notices.closeToast("quoterError"), 4050) // just to make sure
+            const r = Math.random()
+            powercord.api.notices.sendToast(`quoterError-${r}`, { content: `Your quote is too long. Your'e ${ret.length - 2000} chars over the limit.`, timeout: 4000 })
+            setTimeout(() => powercord.api.notices.closeToast(`quoterError-${r}`), 4050) // just to make sure
             return false
         }
         quotedUsers = []

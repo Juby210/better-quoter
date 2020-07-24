@@ -19,7 +19,7 @@ module.exports = class QuoteContainer extends React.Component {
 
     render() {
         return <div className="quoteContainer">
-            {quotedUsers.length > 1 ? <RemoveButton
+            {quotedUsers.length ? <RemoveButton
                 className="removeQuotes"
                 onClick={() => {
                     quotedUsers = []
@@ -28,14 +28,14 @@ module.exports = class QuoteContainer extends React.Component {
                 }}
             /> : null}
             {quotedUsers.map((e, i) => <div className="modifiedQuote">
-                <RemoveButton
+                {quotedUsers.length > 1 ? <RemoveButton
                     className="removeQuote"
                     onClick={() => {
                         quotedUsers.splice(i, 1)
                         dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
                         this.forceUpdate()
                     }}
-                />
+                /> : null}
                 {e}
             </div>)}
         </div>
