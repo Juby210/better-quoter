@@ -108,22 +108,10 @@ module.exports = class BetterQuoter extends Plugin {
         return ret
     }
     createQuotes(quotes = []) {
-        const stacked = []
-        for (let i = 0; i < quotes.length; i++) {
-            const { message } = quotes[i].props
-            if (i && quotes[i - 1].props.message.author.id == message.author.id) {
-                stacked[stacked.length - 1].push(quotes[i])
-                continue
-            }
-            stacked.push([ quotes[i] ])
-        }
         let text = ""
-        for (const messages of stacked) {
-            for (let i = 0; i < messages.length; i++) {
-                const { message, channel } = messages[i].props
-                if (i) text += this.createQuote(message, channel, "stackedFormat", "%quote%") + "\n"
-                else text += this.createQuote(message, channel)
-            }
+        for (const m of quotes) {
+            if (m.props.isGroupStart || m.props.isGroupStart === undefined) text += this.createQuote(m.props.message, m.props.channel)
+            else text += this.createQuote(m.props.message, m.props.channel, "stackedFormat", "%quote%")
         }
         return text
     }

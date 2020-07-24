@@ -25,7 +25,7 @@ class Settings extends React.Component {
             message={new modules.Message({ author: user, content: `hi <@${cUser.id}>!\nthis is second line of my message`, attachments: [{ filename: "test.jsx" }], channel_id })}
             channel={channel}
         />
-        const ExampleMessage2 = <ChannelMessage message={new modules.Message({ author: user, content: "second message", channel_id })} channel={channel} />
+        const ExampleMessage2 = <ChannelMessage message={new modules.Message({ author: user, content: "second message", channel_id })} channel={channel} isGroupStart={false} />
         const message = new modules.Message({ author: cUser, content: this.props.createQuotes([ ExampleMessage, ExampleMessage2 ]), channel_id })
 
         return <>
@@ -80,7 +80,6 @@ class Settings extends React.Component {
             </Flex>
             <FormItem title="Preview:">
                 {ExampleMessage}
-                <div style={{ marginBottom: "15px" }} />
                 {ExampleMessage2}
                 <div style={{ marginBottom: "15px" }} />
                 <ChannelMessage message={message} channel={channel} />

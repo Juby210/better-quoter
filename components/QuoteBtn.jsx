@@ -8,7 +8,7 @@ module.exports = ({ Button, Separator }) => class QuoteBtn extends React.Compone
     render() {
         if (!Button || !Separator) return null
         return <>
-            <Tooltip color="black" postion="top" text={Messages.QUOTE}>
+            <Tooltip text={Messages.QUOTE}>
                 <Button onClick={this.props.onClick.bind(this)}>
                     <BlockQuote />
                 </Button>
