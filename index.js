@@ -111,7 +111,7 @@ module.exports = class BetterQuoter extends Plugin {
         let text = ""
         for (const m of quotes) {
             if (m.props.isGroupStart || m.props.isGroupStart === undefined) text += this.createQuote(m.props.message, m.props.channel)
-            else text += this.createQuote(m.props.message, m.props.channel, "stackedFormat", "%quote%") + "\n"
+            else text += this.createQuote(m.props.message, m.props.channel, "stackedFormat", "%quote%")
         }
         return text
     }
@@ -136,7 +136,7 @@ module.exports = class BetterQuoter extends Plugin {
             const prop = getProp({ message, channel, content, guild }, r.prop)
             text = text.replace(new RegExp(`%${r.selector}%`, "g"), r.eval ? eval(r.eval) : prop)
         })
-        return text
+        return text.endsWith("\n") ? text : text + "\n"
     }
     formatMention(target, role) {
         const format = this.settings.get("replaceMentions", 0)

@@ -55,6 +55,12 @@
         "eval": "prop ? prop : '@me'"
     },
     {
+        "selector": "url",
+        "prop": "guild.id",
+        "desc": "Used to get the message url.",
+        "eval": "`https://discord.com/channels/${prop ? prop : '@me'}/${channel.id}/${message.id}`"
+    },
+    {
         "selector": "files",
         "prop": "message.attachments",
         "desc": "Used to get all the attachments send in the message. Replaced with: [filename.txt]",

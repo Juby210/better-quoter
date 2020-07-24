@@ -27,6 +27,9 @@
     cursor: pointer;
     visibility: hidden;
 }
+.removeStackedQuote > div {
+    height: 24px;
+}
 .modifiedQuote:hover > .removeStackedQuote {
     visibility: visible;
 }

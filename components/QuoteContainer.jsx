@@ -29,7 +29,7 @@ module.exports = class QuoteContainer extends React.Component {
             } else quotedUsers[i].props.isGroupStart = true
         }
         return <div className="quoteContainer">
-            {quotedUsers.length ? <Tooltip text="Cancel Quote" className="removeQuotes">
+            {quotedUsers.length ? <Tooltip position="left" text="Cancel Quote" className="removeQuotes">
                 <RemoveButton
                     onClick={() => {
                         quotedUsers = []
@@ -39,7 +39,7 @@ module.exports = class QuoteContainer extends React.Component {
                 />
             </Tooltip> : null}
             {quotedUsers.map((e, i) => <div className="modifiedQuote">
-                {quotedUsers.length > 1 && e.props.isGroupStart ? <Tooltip text="Cancel Quoting Group" className="removeQuote">
+                {quotedUsers.length > 1 && e.props.isGroupStart ? <Tooltip position="right" text="Cancel Quoting Group" className="removeQuote">
                     <RemoveButton
                         onClick={() => {
                             quotedUsers.splice(i, 1)
@@ -57,7 +57,7 @@ module.exports = class QuoteContainer extends React.Component {
                         dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
                         this.forceUpdate()
                     }}
-                ><Tooltip text="Cancel Quoting Message"><Trash color="#f04747" /></Tooltip></div> : null}
+                ><Tooltip position="left" text="Cancel Quoting Message"><Trash color="#f04747" /></Tooltip></div> : null}
             </div>)}
         </div>
     }
