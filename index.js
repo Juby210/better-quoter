@@ -111,7 +111,7 @@ module.exports = class BetterQuoter extends Plugin {
         let text = ""
         for (const m of quotes) {
             if (m.props.isGroupStart || m.props.isGroupStart === undefined) text += this.createQuote(m.props.message, m.props.channel)
-            else text += this.createQuote(m.props.message, m.props.channel, "stackedFormat", "%quote%")
+            else text += this.createQuote(m.props.message, m.props.channel, "stackedFormat", "%quote%") + "\n"
         }
         return text
     }
