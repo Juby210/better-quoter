@@ -11,6 +11,11 @@
         "eval": "prop != '' ? '> ' + prop.replace(/\\n/g, '\\n> ') : ''"
     },
     {
+        "selector": "id",
+        "prop": "message.id",
+        "desc": "Used to get the id from message."
+    },
+    {
         "selector": "authorid",
         "prop": "message.author.id",
         "desc": "Used to get the id of message author."
@@ -41,13 +46,13 @@
         "selector": "server",
         "prop": "guild.name",
         "desc": "Used to get the name from guild where message was send.",
-        "eval": "prop ? prop : ''"
+        "eval": "prop ? prop : 'DMs'"
     },
     {
         "selector": "serverid",
         "prop": "guild.id",
         "desc": "Used to get the id from guild where message was send.",
-        "eval": "prop ? prop : ''"
+        "eval": "prop ? prop : '@me'"
     },
     {
         "selector": "files",
