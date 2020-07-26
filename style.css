@@ -13,12 +13,12 @@
     top: -10px;
     cursor: pointer;
 }
-.removeQuote {
+.removeGroupQuote {
     position: relative;
     left: -3px;
     width: 24px;
 }
-.removeStackedQuote {
+.removeQuote {
     position: relative;
     top: -30px;
     height: 0;
@@ -27,9 +27,12 @@
     cursor: pointer;
     visibility: hidden;
 }
-.removeStackedQuote > div {
+.removeQuote:hover {
+    --interactive-normal: #f04747;
+}
+.removeQuote > div {
     height: 24px;
 }
-.modifiedQuote:hover > .removeStackedQuote {
+.modifiedQuote:hover > .removeQuote {
     visibility: visible;
 }

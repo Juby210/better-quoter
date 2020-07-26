@@ -27,6 +27,7 @@ class Settings extends React.Component {
         />
         const ExampleMessage2 = <ChannelMessage message={new modules.Message({ author: user, content: "second message", id: "0", channel_id })} channel={channel} isGroupStart={false} />
         const message = new modules.Message({ author: cUser, content: this.props.createQuotes([ ExampleMessage, ExampleMessage2 ]), channel_id })
+        const classic = getSetting("classicMode")
 
         return <>
             <FormItem style={{ marginBottom: "20px" }} title="Format:">
@@ -45,21 +46,26 @@ class Settings extends React.Component {
                     placeholder="Format"
                     value={getSetting("stackedFormat", "%quote%")}
                     onChange={e => updateSetting("stackedFormat", e)}
-                    disabled={getSetting("classicMode")}
+                    disabled={classic}
                 />
-                {getSetting("classicMode") ? <FormText>Stacking messages isn't supported in classic mode yet</FormText> : null}
+                {classic ? <FormText>Stacking messages isn't supported in classic mode yet</FormText> : null}
             </FormItem>
             <Category name="Replace Parameter" description="Placeholder guide, to view all replace parameter." opened={this.state.categoryOpened} onChange={() => this.setState({ categoryOpened: !this.state.categoryOpened })}>
                 {replacers.map(r => <Replacer {...r} />)}
             </Category>
             <SwitchItem
-                value={getSetting("classicMode")}
+                value={classic}
                 onChange={() => {
                     toggleSetting("classicMode")
                     this.props.repatch()
                 }}
                 note="If this option is turned off quotes are shown above text area"
             >Classic mode</SwitchItem>
+            <SwitchItem
+                value={getSetting("useQuoteContainerForAllQuotes", true)}
+                onChange={() => toggleSetting("useQuoteContainerForAllQuotes", true)}
+                note='eg for built-in context menu button "Quote"'
+            >Use QuoteContainer for all quotes</SwitchItem>
             <Flex>
                 <Flex.Child>
                     <div><SelectInput

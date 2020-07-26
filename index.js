@@ -27,9 +27,9 @@ module.exports = class BetterQuoter extends Plugin {
 
         dispatcher.subscribe("BETTER_QUOTER_UPDATE2", this.subscribe = data => quotedUsers = data.quotedUsers)
 
-        const MiniPopover = await getModule(m => m.default && m.default.displayName === "MiniPopover")
+        const ChannelMessage = await getModule(m => m.type && m.type.displayName == "ChannelMessage")
+        const MiniPopover = await getModule(m => m.default && m.default.displayName == "MiniPopover")
         if (MiniPopover) {
-            const ChannelMessage = await getModule(m => m.type && m.type.displayName == "ChannelMessage")
             const QuoteBtn = require("./components/QuoteBtn")(MiniPopover)
             inject("betterquoter-toolbar", MiniPopover, "default", ([{ children }], ret) => {
                 if (!children || !Array.isArray(children) || children.slice(-1).length == 0) return ret
@@ -48,7 +48,12 @@ module.exports = class BetterQuoter extends Plugin {
             MiniPopover.default.displayName = "MiniPopover"
         }
 
-        inject("betterquoter-quote", getModule(["createQuotedText"], false), "createQuotedText", args => this.createQuote(args[0], args[1]))
+        inject("betterquoter-quote", await getModule(["createQuotedText"]), "createQuotedText", ([ message, channel ]) => {
+            if (this.settings.get("classicMode") || !this.settings.get("useQuoteContainerForAllQuotes", true)) return this.createQuote(message, channel)
+            quotedUsers.push(React.createElement(ChannelMessage, { message, channel }))
+            dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE", quotedUsers })
+            return ""
+        })
 
         this.patch()
     }

@@ -28,7 +28,7 @@ module.exports = class QuoteContainer extends React.Component {
                 quotedUsers[i].props.group = previous.group || previous.message.id
             } else quotedUsers[i].props.isGroupStart = true
         }
-        return <div className="quoteContainer">
+        return <div className={`quoteContainer${quotedUsers.length ? " quoting" : ""}`}>
             {quotedUsers.length ? <Tooltip position="left" text="Cancel Quote" className="removeQuotes">
                 <RemoveButton
                     onClick={() => {
@@ -39,25 +39,27 @@ module.exports = class QuoteContainer extends React.Component {
                 />
             </Tooltip> : null}
             {quotedUsers.map((e, i) => <div className="modifiedQuote">
-                {quotedUsers.length > 1 && e.props.isGroupStart ? <Tooltip position="right" text="Cancel Quoting Group" className="removeQuote">
-                    <RemoveButton
-                        onClick={() => {
-                            quotedUsers.splice(i, 1)
-                            quotedUsers = quotedUsers.filter(m => m.props.group != e.props.message.id)
-                            dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
-                            this.forceUpdate()
-                        }}
-                    />
-                </Tooltip> : null}
+                {e.props.isGroupStart && quotedUsers[i + 1] && !quotedUsers[i + 1].props.isGroupStart ?
+                    <Tooltip position="right" text="Cancel Quoting Group" className="removeGroupQuote">
+                        <RemoveButton
+                            onClick={() => {
+                                quotedUsers.splice(i, 1)
+                                quotedUsers = quotedUsers.filter(m => m.props.group != e.props.message.id)
+                                dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
+                                this.forceUpdate()
+                            }} 
+                        />
+                    </Tooltip>
+                : null}
                 {e}
-                {!e.props.isGroupStart || quotedUsers[i + 1] && !quotedUsers[i + 1].props.isGroupStart ? <div
-                    className="removeStackedQuote"
+                {quotedUsers.length > 1 ? <div
+                    className="removeQuote"
                     onClick={() => {
                         quotedUsers.splice(i, 1)
                         dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
                         this.forceUpdate()
                     }}
-                ><Tooltip position="left" text="Cancel Quoting Message"><Trash color="#f04747" /></Tooltip></div> : null}
+                ><Tooltip position="left" text="Cancel Quoting Message"><Trash color="var(--interactive-normal)" /></Tooltip></div> : null}
             </div>)}
         </div>
     }

@@ -13,4 +13,4 @@ Note: this plugin is not finished (yet)
 - [ ] Possibility to set more formats than one
 - [x] Option to replace @ in mentions
 - [ ] Quote only selected text
-- [ ] Setting to use QuoteContainer also from context menu button
+- [x] Setting to use QuoteContainer also from context menu button
