@@ -61,11 +61,11 @@ class Settings extends React.Component {
                 }}
                 note="If this option is turned off quotes are shown above text area"
             >Classic mode</SwitchItem>
-            <SwitchItem
+            {classic ? null : <SwitchItem
                 value={getSetting("useQuoteContainerForAllQuotes", true)}
                 onChange={() => toggleSetting("useQuoteContainerForAllQuotes", true)}
                 note='eg for built-in context menu button "Quote"'
-            >Use QuoteContainer for all quotes</SwitchItem>
+            >Use QuoteContainer for all quotes</SwitchItem>}
             <Flex>
                 <Flex.Child>
                     <div><SelectInput
@@ -84,7 +84,7 @@ class Settings extends React.Component {
                     style={{ marginTop: "32px", maxHeight: "63px" }}
                 >Show full tag in mentions</SwitchItem> : null}
             </Flex>
-            <FormItem title="Preview:">
+            <FormItem title="Preview:" className="quoterPreview">
                 {ExampleMessage}
                 {ExampleMessage2}
                 <div style={{ marginBottom: "15px" }} />

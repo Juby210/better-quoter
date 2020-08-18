@@ -2,6 +2,7 @@ const { Plugin } = require("powercord/entities")
 const { getModule, getModuleByDisplayName, messages, React } = require("powercord/webpack")
 const { inject, uninject } = require("powercord/injector")
 
+const QuoteBtn = require("./components/QuoteBtn")
 const QuoteContainer = require("./components/QuoteContainer")
 const Settings = require("./components/Settings")
 const replacers = require("./replacers.json")
@@ -30,12 +31,12 @@ module.exports = class BetterQuoter extends Plugin {
         const ChannelMessage = await getModule(m => m.type && m.type.displayName == "ChannelMessage")
         const MiniPopover = await getModule(m => m.default && m.default.displayName == "MiniPopover")
         if (MiniPopover) {
-            const QuoteBtn = require("./components/QuoteBtn")(MiniPopover)
             inject("betterquoter-toolbar", MiniPopover, "default", ([{ children }], ret) => {
                 if (!children || !Array.isArray(children) || children.slice(-1).length == 0) return ret
                 const { message, channel } = children.slice(-1)[0].props
                 children.unshift(
                     React.createElement(QuoteBtn, {
+                        Button: MiniPopover.Button,
                         onClick: () => {
                             if (this.settings.get("classicMode")) return this.insertText(this.createQuote(message, channel))
                             quotedUsers.push(React.createElement(ChannelMessage, { message, channel }))

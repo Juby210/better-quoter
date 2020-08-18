@@ -36,3 +36,6 @@
 .modifiedQuote:hover > .removeQuote {
     visibility: visible;
 }
+.quoterPreview img {
+    z-index: 0;
+}

@@ -4,16 +4,8 @@ const { Tooltip } = require("powercord/components")
 const getIcon = getModule(m => m.id && typeof m.keys == "function" && m.keys().includes("./Activity"), false)
 const BlockQuote = getIcon ? getIcon("./BlockQuote").default : null
 
-module.exports = ({ Button, Separator }) => class QuoteBtn extends React.Component {
-    render() {
-        if (!Button || !Separator) return null
-        return <>
-            <Tooltip text={Messages.QUOTE}>
-                <Button onClick={this.props.onClick.bind(this)}>
-                    <BlockQuote />
-                </Button>
-            </Tooltip>
-            <Separator />
-        </>
-    }
-}
+module.exports = ({ Button, onClick }) => Button && onClick ? <Tooltip text={Messages.QUOTE}>
+    <Button onClick={onClick}>
+        <BlockQuote />
+    </Button>
+</Tooltip> : null
