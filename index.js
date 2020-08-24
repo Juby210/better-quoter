@@ -63,6 +63,7 @@ module.exports = class BetterQuoter extends Plugin {
         powercord.api.settings.unregisterSettings(this.entityID);
         ["betterquoter-toolbar", "betterquoter-quote", "betterquoter-textarea", "betterquoter-textarea-submit", "betterquoter-send"].forEach(i => uninject(i))
         if (this.subscribe) dispatcher.unsubscribe("BETTER_QUOTER_UPDATE2", this.subscribe)
+        document.querySelectorAll(".betterQuoterBtn").forEach(e => e.style.display = "none")
     }
 
     async patch(repatch) {
