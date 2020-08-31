@@ -6,6 +6,6 @@ const BlockQuote = getIcon ? getIcon("./BlockQuote").default : null
 
 module.exports = ({ Button, onClick }) => Button && onClick ? <Tooltip className="betterQuoterBtn" text={Messages.QUOTE}>
     <Button onClick={onClick}>
-        <BlockQuote />
+        <BlockQuote width="20" />
     </Button>
 </Tooltip> : null

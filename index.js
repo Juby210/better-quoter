@@ -44,6 +44,8 @@ module.exports = class BetterQuoter extends Plugin {
                         }
                     })
                 )
+                const buttons = children[children.length - 1]
+                if (buttons && buttons.props) buttons.props.canQuote = false
                 return ret
             })
             MiniPopover.default.displayName = "MiniPopover"
