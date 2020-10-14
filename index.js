@@ -5,7 +5,7 @@ const { inject, uninject } = require("powercord/injector")
 const QuoteBtn = require("./components/QuoteBtn")
 const QuoteContainer = require("./components/QuoteContainer")
 const Settings = require("./components/Settings")
-const replacers = require("./replacers.json")
+const vars = require("./variables")
 let quotedUsers = []
 
 const dispatcher = getModule(['dispatch'], false)
@@ -141,9 +141,9 @@ module.exports = class BetterQuoter extends Plugin {
             })
         }
         let text = this.settings.get(setting, d)
-        replacers.forEach(r => {
+        vars.forEach(r => {
             const prop = getProp({ message, channel, content, guild }, r.prop)
-            text = text.replace(new RegExp(`%${r.selector}%`, "g"), r.eval ? eval(r.eval) : prop)
+            text = text.replace(new RegExp(`%${r.selector}%`, "gi"), r.fn ? r.fn(prop, channel, message) : prop)
         })
         return text.endsWith("\n") ? text : text + "\n"
     }

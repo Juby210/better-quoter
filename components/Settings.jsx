@@ -7,7 +7,7 @@ const FormItem = getModuleByDisplayName("FormItem", false)
 const FormText = getModuleByDisplayName("FormText", false)
 
 const Replacer = require("./Replacer")
-const replacers = require("../replacers.json")
+const vars = require("../variables")
 
 class Settings extends React.Component {
     constructor(props) {
@@ -51,7 +51,7 @@ class Settings extends React.Component {
                 {classic ? <FormText>Stacking messages isn't supported in classic mode yet</FormText> : null}
             </FormItem>
             <Category name="Replace Parameter" description="Placeholder guide, to view all replace parameter." opened={this.state.categoryOpened} onChange={() => this.setState({ categoryOpened: !this.state.categoryOpened })}>
-                {replacers.map(r => <Replacer {...r} />)}
+                {vars.map(r => <Replacer {...r} />)}
             </Category>
             <SwitchItem
                 value={classic}
