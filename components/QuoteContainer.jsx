@@ -1,23 +1,20 @@
-const { getModule, getModuleByDisplayName, React } = require("powercord/webpack")
-const { Tooltip } = require("powercord/components")
+const { getModuleByDisplayName, FluxDispatcher, React } = require('powercord/webpack')
+const { Tooltip, Icon } = require('powercord/components')
 
-const RemoveButton = getModuleByDisplayName("RemoveButton", false)
-const dispatcher = getModule(["dispatch"], false)
-const getIcon = getModule(m => m.id && typeof m.keys == "function" && m.keys().includes("./Activity"), false)
-const Trash = getIcon ? getIcon("./Trash").default : null
+const RemoveButton = getModuleByDisplayName('RemoveButton', false)
 let quotedUsers = []
 
 module.exports = class QuoteContainer extends React.Component {
     constructor(props) {
         super(props)
-        dispatcher.subscribe("BETTER_QUOTER_UPDATE", this.subscribe = data => {
+        FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE', this.subscribe = data => {
             quotedUsers = data.quotedUsers
             this.forceUpdate()
         })
     }
 
     componentWillUnmount() {
-        if (this.subscribe) dispatcher.unsubscribe("BETTER_QUOTER_UPDATE", this.subscribe)
+        if (this.subscribe) FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE', this.subscribe)
     }
 
     render() {
@@ -28,24 +25,24 @@ module.exports = class QuoteContainer extends React.Component {
                 quotedUsers[i].props.group = previous.group || previous.message.id
             } else quotedUsers[i].props.isGroupStart = true
         }
-        return <div className={`quoteContainer${quotedUsers.length ? " quoting" : ""}`}>
-            {quotedUsers.length ? <Tooltip position="left" text="Cancel Quote" className="removeQuotes">
+        return <div className={`quoteContainer${quotedUsers.length ? ' quoting' : ''}`}>
+            {quotedUsers.length ? <Tooltip position='left' text='Cancel Quote' className='removeQuotes'>
                 <RemoveButton
                     onClick={() => {
                         quotedUsers = []
-                        dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
+                        FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
                         this.forceUpdate()
                     }}
                 />
             </Tooltip> : null}
-            {quotedUsers.map((e, i) => <div className="modifiedQuote">
+            {quotedUsers.map((e, i) => <div className='modifiedQuote'>
                 {e.props.isGroupStart && quotedUsers[i + 1] && !quotedUsers[i + 1].props.isGroupStart ?
-                    <Tooltip position="right" text="Cancel Quoting Group" className="removeGroupQuote">
+                    <Tooltip position='right' text='Cancel Quoting Group' className='removeGroupQuote'>
                         <RemoveButton
                             onClick={() => {
                                 quotedUsers.splice(i, 1)
                                 quotedUsers = quotedUsers.filter(m => m.props.group != e.props.message.id)
-                                dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
+                                FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
                                 this.forceUpdate()
                             }} 
                         />
@@ -53,13 +50,13 @@ module.exports = class QuoteContainer extends React.Component {
                 : null}
                 {e}
                 {quotedUsers.length > 1 ? <div
-                    className="removeQuote"
+                    className='removeQuote'
                     onClick={() => {
                         quotedUsers.splice(i, 1)
-                        dispatcher.dirtyDispatch({ type: "BETTER_QUOTER_UPDATE2", quotedUsers })
+                        FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
                         this.forceUpdate()
                     }}
-                ><Tooltip position="left" text="Cancel Quoting Message"><Trash color="var(--interactive-normal)" /></Tooltip></div> : null}
+                ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div> : null}
             </div>)}
         </div>
     }

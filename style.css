@@ -39,3 +39,11 @@
 .quoterPreview img {
     z-index: 0;
 }
+
+.quoterFlexSwitch {
+    flex: 1 1 auto;
+    margin-top: 32px;
+}
+.quoterFlexSwitch .divider-3573oO {
+    margin-top: 28px;
+}

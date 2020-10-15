@@ -8,7 +8,7 @@ module.exports = [
         selector: "quote",
         prop: "content",
         desc: "Used to get the content from the message, but already quoted in markdown.",
-        fn: prop => prop != "" ? "> " + prop.replace(/\\n/g, "\\n> ") : ""
+        fn: prop => prop != "" ? "> " + prop.replace(/\n/g, "\n> ") : ""
     },
     {
         selector: "id",

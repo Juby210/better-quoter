@@ -4,8 +4,8 @@ The real better quoter for discord. Allows you to quote multiple messages & user
 Note: this plugin is not finished (yet)
 
 #### Infos
-- This is "port" of Strencher's (not released yet) BD ["Quoter"](https://github.com/Strencher/BetterDiscordStuff/blob/master/Quoter/Quoter.plugin.js) Plugin, but some things are improved or added.
-- Devs: [Strencher](https://github.com/Strencher) & [Juby210](https://github.com/Juby210)
+- This is powercord version of Strencher's (not released yet) BD ["Quoter"](https://github.com/Strencher/BetterDiscordStuff/blob/master/Quoter/Quoter.plugin.js) Plugin. Note that some things are improved or added here.
+- Devs: [Juby210](https://github.com/Juby210) & [Strencher](https://github.com/Strencher)
 - Strencher's [Support Server](https://discord.gg/gvA2ree)
 
 #### TODO
