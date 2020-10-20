@@ -60,7 +60,7 @@ module.exports = class BetterQuoter extends Plugin {
     }
 
     pluginWillUnload() {
-        powercord.api.settings.unregisterSettings(this.entityID);
+        powercord.api.settings.unregisterSettings("better-quoter");
         ['betterquoter-toolbar', 'betterquoter-quote', 'betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send'].forEach(i => uninject(i))
         if (this.subscribe) FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', this.subscribe)
         document.querySelectorAll('.betterQuoterBtn').forEach(e => e.style.display = 'none')
