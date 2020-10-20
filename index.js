@@ -13,7 +13,7 @@ const getProp = (e, t) => t.split('.').reduce((e, p) => e && e[p], e)
 
 module.exports = class BetterQuoter extends Plugin {
     async startPlugin() {
-        powercord.api.settings.registerSettings(this.entityID, {
+        powercord.api.settings.registerSettings("better-quoter", {
             category: this.entityID,
             label: 'BetterQuoter',
             render: props => React.createElement(Settings, {
