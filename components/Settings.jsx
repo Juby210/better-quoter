@@ -54,9 +54,13 @@ class Settings extends React.Component {
                 {vars.map(r => <Replacer {...r} />)}
             </Category>
             <SwitchItem
+                value={getSetting('afterQuote', true)}
+                onChange={() => toggleSetting('afterQuote', true)}
+            >Put your message after the quote format</SwitchItem>
+            <SwitchItem
                 value={getSetting('breakLine', true)}
                 onChange={() => toggleSetting('breakLine', true)}
-            >Append a new line to the end of the quote format</SwitchItem>
+            >Append a new line to the {getSetting('afterQuote', true) ? 'end' : 'beginning'} of the quote format</SwitchItem>
             <SwitchItem
                 value={classic}
                 onChange={() => {

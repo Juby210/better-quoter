@@ -103,7 +103,7 @@ module.exports = class BetterQuoter extends Plugin {
     }
     insertQuotes(content) {
         const quotes = this.createQuotes(quotedUsers)
-        const ret = quotes + content
+        const ret = this.settings.get('afterQuote', true) ? quotes + content : content + quotes
         if (ret.length > 2000) {
             const r = Math.random()
             powercord.api.notices.sendToast(`quoterError-${r}`, { content: `Your quote is too long. Your'e ${ret.length - 2000} chars over the limit.`, timeout: 4000 })
@@ -129,6 +129,7 @@ module.exports = class BetterQuoter extends Plugin {
         const guild = channel.guild_id && getGuild(channel.guild_id)
         const replaceMentions = this.settings.get('replaceMentions', 0)
         let { content } = message
+
         if (replaceMentions) {
             const { getUser } = getModule(['getUser', 'getCurrentUser'], false)
             content = content.replace(/<@[!&]{0,1}([0-9]{10,})>/g, (string, match) => {
@@ -139,12 +140,16 @@ module.exports = class BetterQuoter extends Plugin {
                 return string
             })
         }
+
         let text = this.settings.get(setting, d)
         vars.forEach(r => {
             const prop = getProp({ message, channel, content, guild }, r.prop)
             text = text.replace(new RegExp(`%${r.selector}%`, 'gi'), r.fn ? r.fn(prop, channel, message) : prop)
         })
-        return this.settings.get('breakLine', true) && !text.endsWith('\n') ? text + '\n' : text
+
+        const shouldBreak = this.settings.get('breakLine', true) &&
+            this.settings.get('afterQuote', true) ? !text.endsWith('\n') : !text.startsWith('\n')
+        return shouldBreak ? this.settings.get('afterQuote', true) ? text + '\n' : '\n' + text : text
     }
     formatMention(target, role) {
         const format = this.settings.get('replaceMentions', 0)
