@@ -61,13 +61,14 @@ module.exports = class BetterQuoter extends Plugin {
 
     pluginWillUnload() {
         powercord.api.settings.unregisterSettings(this.entityID);
-        ['betterquoter-toolbar', 'betterquoter-quote', 'betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send'].forEach(i => uninject(i))
+        ['betterquoter-toolbar','betterquoter-quote', 'betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send', 'betterquoter-upload']
+            .forEach(i => uninject(i))
         if (this.subscribe) FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', this.subscribe)
         document.querySelectorAll('.betterQuoterBtn').forEach(e => e.style.display = 'none')
     }
 
     async patch(repatch) {
-        if (repatch) ['betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send'].forEach(i => uninject(i))
+        if (repatch) ['betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send', 'betterquoter-upload'].forEach(i => uninject(i))
         if (this.settings.get('classicMode')) return
         const ChannelTextAreaGuard = await getModuleByDisplayName('ChannelTextAreaGuard')
         inject('betterquoter-textarea', ChannelTextAreaGuard.prototype, 'render', (_, res) => {
@@ -79,7 +80,7 @@ module.exports = class BetterQuoter extends Plugin {
         const { serialize } = await getModule(['serialize', 'serializeSelection']), _this = this
         const SlateChannelTextArea = await getModuleByDisplayName('SlateChannelTextArea')
         inject('betterquoter-textarea-submit', SlateChannelTextArea.prototype, 'handleTabOrEnterDown', function (_, submit) {
-            if (submit && quotedUsers.length) {
+            if (submit && quotedUsers.length && !this.props.textAreaPaddingClassName.includes('WithoutAttachmentButton')) {
                 const serialized = serialize(this.props.value.document, 'raw')
                 if (!serialized.trim()) {
                     const content = _this.insertQuotes(serialized)
@@ -89,10 +90,18 @@ module.exports = class BetterQuoter extends Plugin {
             return submit
         })
         inject('betterquoter-send', messages, 'sendMessage', args => {
-            if (quotedUsers.length) {
+            if (quotedUsers.length && args.length >= 2) {
                 const content = this.insertQuotes(args[1].content)
                 if (!content) return false
                 args[1].content = content
+            }
+            return args
+        }, true)
+        const uploadModule = await getModule(['cancel', 'upload'])
+        inject('betterquoter-upload', uploadModule, 'upload', args => {
+            if (quotedUsers.length && args.length >= 3) {
+                const content = this.insertQuotes(args[2].content)
+                if (content) args[2].content = content
             }
             return args
         }, true)
