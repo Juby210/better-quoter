@@ -1,22 +1,11 @@
-.quoteContainer {
-    position: relative;
-    padding-bottom: 5px;
-    padding-top: 5px;
-}
 .modifiedQuote {
     margin: 5px 0px 5px 0px;
-    background-color: var(--background-primary);
 }
-.removeQuotes {
-    position: absolute;
-    right: 0;
-    top: -10px;
-    cursor: pointer;
+.modifiedQuote:first-of-type {
+    padding-top: 5px;
 }
-.removeGroupQuote {
-    position: relative;
-    left: -3px;
-    width: 24px;
+.modifiedQuote .divider-3573oO {
+    margin: 10px 0;
 }
 .removeQuote {
     position: relative;
@@ -36,10 +25,10 @@
 .modifiedQuote:hover > .removeQuote {
     visibility: visible;
 }
+
 .quoterPreview img {
     z-index: 0;
 }
-
 .quoterFlexSwitch {
     flex: 1 1 auto;
     margin-top: 32px;

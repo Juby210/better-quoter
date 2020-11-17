@@ -1,8 +1,12 @@
-const { getModuleByDisplayName, FluxDispatcher, React } = require('powercord/webpack')
-const { Tooltip, Icon } = require('powercord/components')
+const { getModule, FluxDispatcher, React } = require('powercord/webpack')
+const { Divider, Tooltip, Icon } = require('powercord/components')
 
-const RemoveButton = getModuleByDisplayName('RemoveButton', false)
 let quotedUsers = []
+
+const classes = {
+    ...getModule(['actions', 'container'], false),
+    ...getModule(['colorHeaderSecondary'], false)
+}
 
 module.exports = class QuoteContainer extends React.Component {
     constructor(props) {
@@ -18,6 +22,7 @@ module.exports = class QuoteContainer extends React.Component {
     }
 
     render() {
+        if (!quotedUsers.length) return null
         for (let i = 0; i < quotedUsers.length; i++) {
             if (i && quotedUsers[i].props.message.author.id == quotedUsers[i - 1].props.message.author.id) {
                 quotedUsers[i].props.isGroupStart = false
@@ -25,39 +30,34 @@ module.exports = class QuoteContainer extends React.Component {
                 quotedUsers[i].props.group = previous.group || previous.message.id
             } else quotedUsers[i].props.isGroupStart = true
         }
-        return <div className={`quoteContainer${quotedUsers.length ? ' quoting' : ''}`}>
-            {quotedUsers.length ? <Tooltip position='left' text='Cancel Quote' className='removeQuotes'>
-                <RemoveButton
-                    onClick={() => {
-                        quotedUsers = []
-                        FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
-                        this.forceUpdate()
-                    }}
-                />
-            </Tooltip> : null}
-            {quotedUsers.map((e, i) => <div className='modifiedQuote'>
-                {e.props.isGroupStart && quotedUsers[i + 1] && !quotedUsers[i + 1].props.isGroupStart ?
-                    <Tooltip position='right' text='Cancel Quoting Group' className='removeGroupQuote'>
-                        <RemoveButton
-                            onClick={() => {
-                                quotedUsers.splice(i, 1)
-                                quotedUsers = quotedUsers.filter(m => m.props.group != e.props.message.id)
-                                FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
-                                this.forceUpdate()
-                            }} 
-                        />
-                    </Tooltip>
-                : null}
-                {e}
-                {quotedUsers.length > 1 ? <div
-                    className='removeQuote'
-                    onClick={() => {
-                        quotedUsers.splice(i, 1)
-                        FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
-                        this.forceUpdate()
-                    }}
-                ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div> : null}
-            </div>)}
+        return <div className={`${classes.container} quoteContainer quoting`}>
+            <div className={`${classes.colorHeaderSecondary} ${classes.text}`}>
+                {quotedUsers.map((e, i) => <div className='modifiedQuote'>
+                    {e.props.isGroupStart && i ? <Divider /> : null}
+                    {e}
+                    {quotedUsers.length > 1 ? <div
+                        className='removeQuote'
+                        onClick={() => {
+                            quotedUsers.splice(i, 1)
+                            FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
+                            this.forceUpdate()
+                        }}
+                    ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div> : null}
+                </div>)}
+            </div>
+            <div className={classes.actions}>
+                <Tooltip position='left' text='Cancel Quote' className={classes.closeButton}>
+                    <Icon
+                        name='CloseCircle'
+                        className={classes.closeIcon}
+                        onClick={() => {
+                            quotedUsers = []
+                            FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
+                            this.forceUpdate()
+                        }}
+                    />
+                </Tooltip>
+            </div>
         </div>
     }
 }
