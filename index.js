@@ -30,8 +30,9 @@ module.exports = class BetterQuoter extends Plugin {
         const MiniPopover = await getModule(m => m.default && m.default.displayName == 'MiniPopover')
         if (MiniPopover) {
             inject('betterquoter-toolbar', MiniPopover, 'default', ([{ children }], ret) => {
-                if (!children || !Array.isArray(children) || children.slice(-1).length == 0) return ret
-                const { message, channel } = children.slice(-1)[0].props
+                if (!children || !Array.isArray(children) || children.slice(-1).length === 0) return ret
+                const { props: { message, channel } } = children.slice(-1)[0] || { props: {} }
+                if (!message || !channel) return ret
                 children.unshift(
                     React.createElement(QuoteBtn, {
                         Button: MiniPopover.Button,
@@ -156,8 +157,8 @@ module.exports = class BetterQuoter extends Plugin {
             text = text.replace(new RegExp(`%${r.selector}%`, 'gi'), r.fn ? r.fn(prop, channel, message) : prop)
         })
 
-        const shouldBreak = this.settings.get('breakLine', true) &&
-            this.settings.get('afterQuote', true) ? !text.endsWith('\n') : !text.startsWith('\n')
+        const shouldBreak = this.settings.get('breakLine', true) ?
+            this.settings.get('afterQuote', true) ? !text.endsWith('\n') : !text.startsWith('\n') : false
         return shouldBreak ? this.settings.get('afterQuote', true) ? text + '\n' : '\n' + text : text
     }
     formatMention(target, role) {
