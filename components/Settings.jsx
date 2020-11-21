@@ -20,7 +20,7 @@ class Settings extends React.Component {
         const { getSetting, updateSetting, toggleSetting, modules } = this.props
         const cUser = modules.getCurrentUser(), channel_id = channels.getChannelId() || channels.getLastSelectedChannelId()
         const channel = new modules.Channel({ name: 'testing', id: channel_id, guild_id: modules.getGuildId() || modules.getLastSelectedGuildId() })
-        const user = new modules.User({ username: 'Example User' })
+        const user = new modules.User({ id: '0', username: 'Example User' })
         const ExampleMessage = <ChannelMessage
             message={new modules.Message({ author: user, content: `hi <@${cUser.id}>!\nthis is second line of my message`, attachments: [{ filename: 'test.jsx' }], id: '0', channel_id })}
             channel={channel}
