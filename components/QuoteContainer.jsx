@@ -6,7 +6,8 @@ let quotedUsers = []
 const classes = {
     ...getModule(['actions', 'container'], false),
     ...getModule(['colorHeaderSecondary'], false),
-    ...getModule(['auto', 'scrollerBase'], false)
+    ...getModule(['auto', 'scrollerBase'], false),
+    ...getModule(['size14'], false)
 }
 
 module.exports = class QuoteContainer extends React.Component {
@@ -38,9 +39,10 @@ module.exports = class QuoteContainer extends React.Component {
         }
         authors = _.sortBy(authors, 'username')
 
-        return <div className={`${classes.container} quoteContainer`}>
+        return <div className='quoteContainer'>
             <div className={`${classes.container} quoteHeader`}>
-                <div className={`${classes.colorHeaderSecondary} ${classes.text}`}>
+                <div className={`${classes.colorHeaderSecondary} ${classes.size14} ${classes.text}`}>
+                    {/* TODO: role color and maybe nicknames? :p */}
                     Quoting {authors.reduce((items, item, index, _this) => {
                     if (_this.length === 1) return items.concat(<span class={classes.name}>{item.username}</span>)
                     if (index === _this.length - 1) items.push(' and ')
@@ -62,18 +64,20 @@ module.exports = class QuoteContainer extends React.Component {
                 </div>
             </div>
             <div className={`${classes.auto} ${classes.scrollerBase} quoteMessages`}>
-                {quotedUsers.map((e, i) => <div className='modifiedQuote'>
+                {quotedUsers.map((e, i) => <>
                     {e.props.isGroupStart && i ? <Divider /> : null}
-                    {e}
-                    <div
-                        className='removeQuote'
-                        onClick={() => {
-                            quotedUsers.splice(i, 1)
-                            FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
-                            this.forceUpdate()
-                        }}
-                    ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div>
-                </div>)}
+                    <div className={`modifiedQuote${e.props.isGroupStart ? 'stackedQuote' : ''}`}>
+                        {e}
+                        {/* TODO: move it to top (help needed!) */}
+                        <div
+                            className='removeQuote'
+                            onClick={() => {
+                                quotedUsers.splice(i, 1)
+                                FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
+                                this.forceUpdate()
+                            }}
+                        ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div>
+                </div></>)}
             </div>
         </div>
     }

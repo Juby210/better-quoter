@@ -1,10 +1,8 @@
-.quoteContainer {
-    display: block;
-}
 .quoteHeader {
     background: var(--background-secondary-alt);
 }
 .quoteMessages {
+    background: var(--background-secondary);
     padding: 12px 0;
     max-height: 30vh;
     overflow: hidden auto;
@@ -12,14 +10,18 @@
 }
 
 .modifiedQuote {
-    margin: 0 8px;
+    margin: 0 8px 0 4px;
+}
+.modifiedQuote:not(.stackedQuote) {
+    padding-top: 4px;
 }
 .modifiedQuote:hover {
     background: var(--background-modifier-hover);
 }
-.modifiedQuote .divider-3573oO {
+.quoteMessages .divider-3573oO {
     margin: 10px 0;
 }
+
 .removeQuote {
     position: relative;
     top: -30px;
