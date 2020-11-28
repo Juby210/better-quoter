@@ -62,6 +62,11 @@ class Settings extends React.Component {
                 onChange={() => toggleSetting('breakLine', true)}
             >Append a new line to the {getSetting('afterQuote', true) ? 'end' : 'beginning'} of the quote format</SwitchItem>
             <SwitchItem
+                value={getSetting('quoteOnlySelected')}
+                onChange={() => toggleSetting('quoteOnlySelected')}
+                note='Beta feature'
+            >Quote only selected text from message</SwitchItem>
+            <SwitchItem
                 value={classic}
                 onChange={() => {
                     toggleSetting('classicMode')
@@ -69,11 +74,6 @@ class Settings extends React.Component {
                 }}
                 note='If this option is turned off quotes are shown above text area'
             >Classic mode</SwitchItem>
-            {classic ? null : <SwitchItem
-                value={getSetting('useQuoteContainerForAllQuotes', true)}
-                onChange={() => toggleSetting('useQuoteContainerForAllQuotes', true)}
-                note='eg for built-in context menu button "Quote"'
-            >Use QuoteContainer for all quotes</SwitchItem>}
             <Flex>
                 <Flex.Child>
                     <div><SelectInput

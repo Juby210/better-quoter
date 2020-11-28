@@ -11,6 +11,9 @@ let quotedUsers = []
 // Below Copied from ZLibrary
 const getProp = (e, t) => t.split('.').reduce((e, p) => e && e[p], e)
 
+const { getGuild } = getModule(['getGuild'], false) || {}
+const { getMessage } = getModule(['getMessages'], false) || {}
+
 module.exports = class BetterQuoter extends Plugin {
     async startPlugin() {
         powercord.api.settings.registerSettings(this.entityID, {
@@ -26,6 +29,7 @@ module.exports = class BetterQuoter extends Plugin {
 
         FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', this.subscribe = data => quotedUsers = data.quotedUsers)
 
+        const Message = await getModule(m => m.prototype && m.prototype.getReaction && m.prototype.isSystemDM)
         const ChannelMessage = await getModule(m => m.type && m.type.displayName == 'ChannelMessage')
         const MiniPopover = await getModule(m => m.default && m.default.displayName == 'MiniPopover')
         if (MiniPopover) {
@@ -37,8 +41,15 @@ module.exports = class BetterQuoter extends Plugin {
                     React.createElement(QuoteBtn, {
                         Button: MiniPopover.Button,
                         onClick: () => {
-                            if (this.settings.get('classicMode')) return this.insertText(this.createQuote(message, channel))
-                            quotedUsers.push(React.createElement(ChannelMessage, { message, channel }))
+                            let content = message.content
+                            if (this.settings.get('quoteOnlySelected')) {
+                                const selection = this.getSelection()
+                                if (selection && content.includes(selection.substr(4, selection.length - 8))) content = selection
+                            }
+
+                            const msg = content !== message.content ? new Message({ ...message, content }) : message
+                            if (this.settings.get('classicMode')) return this.insertText(this.createQuote(msg, channel))
+                            quotedUsers.push(React.createElement(ChannelMessage, { message: msg, channel }))
                             FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE', quotedUsers })
                         }
                     })
@@ -49,13 +60,6 @@ module.exports = class BetterQuoter extends Plugin {
             })
             MiniPopover.default.displayName = 'MiniPopover'
         }
-
-        inject('betterquoter-quote', await getModule(['createQuotedText']), 'createQuotedText', ([ message, channel ]) => {
-            if (this.settings.get('classicMode') || !this.settings.get('useQuoteContainerForAllQuotes', true)) return this.createQuote(message, channel)
-            quotedUsers.push(React.createElement(ChannelMessage, { message, channel }))
-            FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE', quotedUsers })
-            return ''
-        })
 
         this.patch()
     }
@@ -135,7 +139,6 @@ module.exports = class BetterQuoter extends Plugin {
     }
 
     createQuote(message, channel, setting = 'text', d = '> `%name% - %time%` in <#%channelid%>\n%quote%\n%files%') {
-        const { getGuild } = getModule(['getGuild'], false)
         const guild = channel.guild_id && getGuild(channel.guild_id)
         const replaceMentions = this.settings.get('replaceMentions', 0)
         let { content } = message
@@ -154,7 +157,7 @@ module.exports = class BetterQuoter extends Plugin {
         let text = this.settings.get(setting, d)
         vars.forEach(r => {
             const prop = getProp({ message, channel, content, guild }, r.prop)
-            text = text.replace(new RegExp(`%${r.selector}%`, 'gi'), r.fn ? r.fn(prop, channel, message) : prop)
+            text = text.replace(new RegExp(`%${r.selector}%`, 'gi'), r.fn ? r.fn(prop, channel, message, { getMessage }) : prop)
         })
 
         const shouldBreak = this.settings.get('breakLine', true) ?
@@ -175,5 +178,36 @@ module.exports = class BetterQuoter extends Plugin {
     async insertText(content) {
         const { ComponentDispatch } = await getModule(['ComponentDispatch'])
         ComponentDispatch.dispatchToLastSubscribed('INSERT_TEXT', { content })
+    }
+
+    // send help.
+    getSelection() {
+        return this.parseNodes(getSelection().getRangeAt(0).cloneContents().childNodes).trim()
+    }
+    parseNodes(nodes) {
+        return Array.from(nodes).map(this.parseNode.bind(this)).join('')
+    }
+    parseNode(n) {
+        let c = n.textContent
+        if (!c) return c
+        if (n.childNodes && n.childNodes.length > 0) c = this.parseNodes(n.childNodes)
+
+        switch (n.tagName) {
+            case 'BLOCKQUOTE':
+                const parsed = this.parseNodes(n.childNodes).replace('\n', '\n> ')
+                const ret = `> ${parsed}${parsed.endsWith('\n') ? '' : '\n'}`
+                return ret.endsWith('> \n') ? ret.substr(0, ret.length - 3) : ret
+            case 'STRONG':
+                return `**${c}**`
+            case 'EM':
+                return `*${c}*`
+            case 'S':
+                return `~~${c}~~`
+            case 'CODE':
+                return `\`${c}\``
+            case 'SPAN':
+                if (n.className && n.className.indexOf('latin') === 0) return '' // timestamp
+        }
+        return c
     }
 }

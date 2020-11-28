@@ -65,5 +65,23 @@ module.exports = [
         prop: "message.attachments",
         desc: "Used to get all the attachments send in the message. Replaced with: [filename.txt]",
         fn: prop => prop.map(e => `[${e.filename}]`).join(" ")
+    },
+    {
+        selector: "replycontent",
+        prop: "message.messageReference",
+        desc: "Used to quote reply content",
+        fn: getReplyContent
+    },
+    {
+        selector: "quotereplycontent",
+        prop: "message.messageReference",
+        desc: 'Used to quote reply content with "> " prefix',
+        fn: (...args) => getReplyContent(...args) ? '> ' + getReplyContent(...args) : ''
     }
 ]
+
+function getReplyContent(prop, c, m, { getMessage }) {
+    const msg = prop && getMessage(prop.channel_id, prop.message_id)
+    if (!msg) return ''
+    return msg.content.substr(0, 60).replace('\n', ' ') + '\n'
+}

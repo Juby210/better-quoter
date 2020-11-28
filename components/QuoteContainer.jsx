@@ -5,7 +5,8 @@ let quotedUsers = []
 
 const classes = {
     ...getModule(['actions', 'container'], false),
-    ...getModule(['colorHeaderSecondary'], false)
+    ...getModule(['colorHeaderSecondary'], false),
+    ...getModule(['auto', 'scrollerBase'], false)
 }
 
 module.exports = class QuoteContainer extends React.Component {
@@ -23,40 +24,56 @@ module.exports = class QuoteContainer extends React.Component {
 
     render() {
         if (!quotedUsers.length) return null
+
+        let authors = []
         for (let i = 0; i < quotedUsers.length; i++) {
-            if (i && quotedUsers[i].props.message.author.id == quotedUsers[i - 1].props.message.author.id) {
+            if (i && quotedUsers[i].props.message.author.id === quotedUsers[i - 1].props.message.author.id) {
                 quotedUsers[i].props.isGroupStart = false
                 const previous = quotedUsers[i - 1].props
                 quotedUsers[i].props.group = previous.group || previous.message.id
-            } else quotedUsers[i].props.isGroupStart = true
+            } else {
+                quotedUsers[i].props.isGroupStart = true
+                if (!authors.includes(quotedUsers[i].props.message.author)) authors.push(quotedUsers[i].props.message.author)
+            }
         }
-        return <div className={`${classes.container} quoteContainer quoting`}>
-            <div className={`${classes.colorHeaderSecondary} ${classes.text}`}>
+        authors = _.sortBy(authors, 'username')
+
+        return <div className={`${classes.container} quoteContainer`}>
+            <div className={`${classes.container} quoteHeader`}>
+                <div className={`${classes.colorHeaderSecondary} ${classes.text}`}>
+                    Quoting {authors.reduce((items, item, index, _this) => {
+                    if (_this.length === 1) return items.concat(<span class={classes.name}>{item.username}</span>)
+                    if (index === _this.length - 1) items.push(' and ')
+                    return items.concat(<span class={classes.name}>{item.username}</span>, index === _this.length - 1 || index === _this.length - 2 ? null : ', ').filter(e => e)
+                }, [])}
+                </div>
+                <div className={classes.actions}>
+                    <Tooltip text='Close' className={classes.closeButton}>
+                        <Icon
+                            name='CloseCircle'
+                            className={classes.closeIcon}
+                            onClick={() => {
+                                quotedUsers = []
+                                FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
+                                this.forceUpdate()
+                            }}
+                        />
+                    </Tooltip>
+                </div>
+            </div>
+            <div className={`${classes.auto} ${classes.scrollerBase} quoteMessages`}>
                 {quotedUsers.map((e, i) => <div className='modifiedQuote'>
                     {e.props.isGroupStart && i ? <Divider /> : null}
                     {e}
-                    {quotedUsers.length > 1 ? <div
+                    <div
                         className='removeQuote'
                         onClick={() => {
                             quotedUsers.splice(i, 1)
                             FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
                             this.forceUpdate()
                         }}
-                    ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div> : null}
+                    ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div>
                 </div>)}
-            </div>
-            <div className={classes.actions}>
-                <Tooltip position='left' text='Cancel Quote' className={classes.closeButton}>
-                    <Icon
-                        name='CloseCircle'
-                        className={classes.closeIcon}
-                        onClick={() => {
-                            quotedUsers = []
-                            FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
-                            this.forceUpdate()
-                        }}
-                    />
-                </Tooltip>
             </div>
         </div>
     }

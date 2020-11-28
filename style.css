@@ -1,8 +1,21 @@
-.modifiedQuote {
-    margin: 5px 0px 5px 0px;
+.quoteContainer {
+    display: block;
 }
-.modifiedQuote:first-of-type {
-    padding-top: 5px;
+.quoteHeader {
+    background: var(--background-secondary-alt);
+}
+.quoteMessages {
+    padding: 12px 0;
+    max-height: 30vh;
+    overflow: hidden auto;
+    cursor: default;
+}
+
+.modifiedQuote {
+    margin: 0 8px;
+}
+.modifiedQuote:hover {
+    background: var(--background-modifier-hover);
 }
 .modifiedQuote .divider-3573oO {
     margin: 10px 0;
@@ -15,6 +28,7 @@
     justify-content: flex-end;
     cursor: pointer;
     visibility: hidden;
+    margin-right: 5px;
 }
 .removeQuote:hover {
     --interactive-normal: #f04747;
