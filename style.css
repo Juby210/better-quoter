@@ -1,50 +1,54 @@
-.quoteHeader {
-    background: var(--background-secondary-alt);
-}
+/* Doesn't appear to mess up anything */
+.form-2fGMdU:before { display: none }
+
 .quoteMessages {
     background: var(--background-secondary);
-    padding: 12px 0;
+    padding: 8px;
     max-height: 30vh;
     overflow: hidden auto;
     cursor: default;
 }
 
+.quoteHeader {
+    background: var(--background-secondary-alt);
+    cursor: default;
+}
+
 .modifiedQuote {
-    margin: 0 8px 0 4px;
+    display: grid;
+    grid-template-columns: auto min-content;
+    padding: 6px;
 }
-.modifiedQuote:not(.stackedQuote) {
-    padding-top: 4px;
-}
+.modifiedQuote:not(.stackedQuote) { padding-top: 4px }
 .modifiedQuote:hover {
     background: var(--background-modifier-hover);
 }
-.quoteMessages .divider-3573oO {
-    margin: 10px 0;
-}
 
-.removeQuote {
-    position: relative;
-    top: -30px;
-    height: 0;
-    display: flex;
-    justify-content: flex-end;
-    cursor: pointer;
-    visibility: hidden;
-    margin-right: 5px;
-}
-.removeQuote:hover {
-    --interactive-normal: #f04747;
-}
-.removeQuote > div {
-    height: 24px;
-}
+.modifiedQuote > div:first-child { padding-left: 64px }
+
+.quoteMessages .avatar-1BDn8e { left: 8px }
+
+.quoteMessages .divider-3573oO { margin: 8px 0 }
+
 .modifiedQuote:hover > .removeQuote {
     visibility: visible;
 }
 
-.quoterPreview img {
-    z-index: 0;
+.removeQuote {
+    visibility: hidden;
+    margin-top: 2px;
+    height: min-content;
+    cursor: pointer;
 }
+.removeQuote > div { height: 24px }
+
+.removeQuote:hover {
+    --interactive-normal: #f04747;
+}
+
+
+.quoterPreview img { z-index: 0 }
+
 .quoterFlexSwitch {
     flex: 1 1 auto;
     margin-top: 32px;
