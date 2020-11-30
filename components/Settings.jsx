@@ -22,7 +22,7 @@ class Settings extends React.Component {
         const channel = new modules.Channel({ name: 'testing', id: channel_id, guild_id: modules.getGuildId() || modules.getLastSelectedGuildId() })
         const user = new modules.User({ id: '0', username: 'Example User' })
         const ExampleMessage = <ChannelMessage
-            message={new modules.Message({ author: user, content: `hi <@${cUser.id}>!\nthis is second line of my message`, attachments: [{ filename: 'test.jsx' }], id: '0', channel_id })}
+            message={new modules.Message({ author: user, content: `hi <@${cUser.id}>!\nthis is second line of my message`, attachments: [{ filename: 'test.jsx', size: Math.random() * 1e+16 }], id: '0', channel_id })}
             channel={channel}
         />
         const ExampleMessage2 = <ChannelMessage message={new modules.Message({ author: user, content: 'second message', id: '0', channel_id })} channel={channel} isGroupStart={false} />
