@@ -64,8 +64,7 @@ class Settings extends React.Component {
             <SwitchItem
                 value={getSetting('quoteOnlySelected')}
                 onChange={() => toggleSetting('quoteOnlySelected')}
-                note='Beta feature'
-            >Quote only selected text from message</SwitchItem>
+            >Quote only selected text from message <sup className={modules.classes.beta}>BETA</sup></SwitchItem>
             <SwitchItem
                 value={classic}
                 onChange={() => {
@@ -105,6 +104,7 @@ class Settings extends React.Component {
 module.exports = props => <AsyncComponent _provider={async () => {
     const { getGuildId, getLastSelectedGuildId } = await getModule(['getLastSelectedGuildId'])
     props.modules = {
+        classes: await getModule(m => m.beta && !m.channel),
         getCurrentUser: (await getModule(['getCurrentUser'])).getCurrentUser,
         getGuildId, getLastSelectedGuildId,
         Channel: await getModule(m => m.prototype && m.prototype.isCategory && m.prototype.isOwner),

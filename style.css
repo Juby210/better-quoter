@@ -1,6 +1,3 @@
-/* Doesn't appear to mess up anything */
-.form-2fGMdU:before { display: none }
-
 .quoteMessages {
     background: var(--background-secondary);
     padding: 8px;
@@ -17,9 +14,9 @@
 .modifiedQuote {
     display: grid;
     grid-template-columns: auto min-content;
-    padding: 6px;
+    padding: 0 6px;
 }
-.modifiedQuote:not(.stackedQuote) { padding-top: 4px }
+.modifiedQuote:not(.stackedQuote) { padding-top: 6px }
 .modifiedQuote:hover {
     background: var(--background-modifier-hover);
 }

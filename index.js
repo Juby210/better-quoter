@@ -1,4 +1,5 @@
 const { Plugin } = require('powercord/entities')
+const { findInReactTree } = require('powercord/util')
 const { getModule, getModuleByDisplayName, messages, FluxDispatcher, React } = require('powercord/webpack')
 const { inject, uninject } = require('powercord/injector')
 
@@ -15,6 +16,8 @@ const { getGuild } = getModule(['getGuild'], false) || {}
 const { getMessage } = getModule(['getMessages'], false) || {}
 
 module.exports = class BetterQuoter extends Plugin {
+    injections = ['betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send', 'betterquoter-upload', 'betterquoter-reply', 'betterquoter-message']
+
     async startPlugin() {
         powercord.api.settings.registerSettings(this.entityID, {
             category: this.entityID,
@@ -66,22 +69,33 @@ module.exports = class BetterQuoter extends Plugin {
 
     pluginWillUnload() {
         powercord.api.settings.unregisterSettings(this.entityID);
-        ['betterquoter-toolbar','betterquoter-quote', 'betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send', 'betterquoter-upload']
-            .forEach(i => uninject(i))
+        [ 'betterquoter-toolbar', ...this.injections ].forEach(i => uninject(i))
         if (this.subscribe) FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', this.subscribe)
         document.querySelectorAll('.betterQuoterBtn').forEach(e => e.style.display = 'none')
     }
 
     async patch(repatch) {
-        if (repatch) ['betterquoter-textarea', 'betterquoter-textarea-submit', 'betterquoter-send', 'betterquoter-upload'].forEach(i => uninject(i))
+        if (repatch) this.injections.forEach(i => uninject(i))
         if (this.settings.get('classicMode')) return
-        const ChannelTextAreaGuard = await getModuleByDisplayName('ChannelTextAreaGuard')
-        inject('betterquoter-textarea', ChannelTextAreaGuard.prototype, 'render', (_, res) => {
-            const old = res.props.children
-            if (typeof old == 'function') res.props.children = e => [ React.createElement(QuoteContainer), old(e) ]
-            else res.props.children = React.createElement(React.Fragment, null, React.createElement(QuoteContainer), old)
+        const classes = {
+            ...await getModule(['hasReply']),
+            ...await getModule(['message', 'replying'])
+        }
+        const ChannelTextAreaContainer = await getModule(m => m?.type?.render?.displayName === 'ChannelTextAreaContainer')
+        inject('betterquoter-textarea', ChannelTextAreaContainer.type, 'render', (_, res) => {
+            const forceUpdate = React.useState()[1]
+            React.useEffect(this.updater(forceUpdate), [ forceUpdate ])
+
+            if (!res?.props?.children?.props?.children) return res
+            const { children } = res.props.children.props
+            children.unshift(React.createElement(QuoteContainer))
+            if (quotedUsers.length) {
+                const textArea = findInReactTree(children, e => e?.onScroll)
+                if (textArea) textArea.className += ' ' + classes.hasReply
+            }
             return res
         })
+        ChannelTextAreaContainer.type.render.displayName = 'ChannelTextAreaContainer'
         const { serialize } = await getModule(['serialize', 'serializeSelection']), _this = this
         const SlateChannelTextArea = await getModuleByDisplayName('SlateChannelTextArea')
         inject('betterquoter-textarea-submit', SlateChannelTextArea.prototype, 'handleTabOrEnterDown', function (_, submit) {
@@ -110,8 +124,42 @@ module.exports = class BetterQuoter extends Plugin {
             }
             return args
         }, true)
+
+        const ChannelReply = await getModule(m => m?.default?.displayName === 'ChannelReply')
+        inject('betterquoter-reply', ChannelReply, 'default', (_, res) => {
+            if (quotedUsers.length && res?.props) res.props.style = { 'border-top-left-radius': 0, 'border-top-right-radius': 0 }
+            return res
+        })
+        ChannelReply.default.displayName = 'ChannelReply'
+
+        const Message = await getModule(m => m.type && (m.__powercordOriginal_type || m.type).toString().indexOf('useContextMenuMessage') !== -1)
+        inject('betterquoter-message', Message, 'type', (args, res) => {
+            const forceUpdate = React.useState()[1]
+            React.useEffect(() => {
+                const callback = () => forceUpdate({})
+                FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', callback)
+                return () => FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', callback)
+            }, [ forceUpdate ])
+
+            if (!res?.props?.className || !quotedUsers.length) return res
+            if (quotedUsers.find(m => m.props.message.id === args[0].message.id)) res.props.className += ' ' + classes.replying
+
+            return res
+        })
+        Message.type.toString = () => Message.__powercordOriginal_type.toString()
     }
 
+    updater(forceUpdate) {
+        return () => {
+            const callback = () => forceUpdate({})
+            FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE', callback)
+            FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', callback)
+            return () => {
+                FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE', callback)
+                FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', callback)
+            }
+        }
+    }
     get quoted() {
         return quotedUsers
     }
@@ -182,7 +230,8 @@ module.exports = class BetterQuoter extends Plugin {
 
     // send help.
     getSelection() {
-        return this.parseNodes(getSelection().getRangeAt(0).cloneContents().childNodes).trim()
+        const sel = getSelection()
+        return sel.rangeCount > 0 ? this.parseNodes(sel.getRangeAt(0).cloneContents().childNodes).trim() : ''
     }
     parseNodes(nodes) {
         return Array.from(nodes).map(this.parseNode.bind(this)).join('')
@@ -194,7 +243,7 @@ module.exports = class BetterQuoter extends Plugin {
 
         switch (n.tagName) {
             case 'BLOCKQUOTE':
-                const parsed = this.parseNodes(n.childNodes).replace('\n', '\n> ')
+                const parsed = c.replace('\n', '\n> ')
                 const ret = `> ${parsed}${parsed.endsWith('\n') ? '' : '\n'}`
                 return ret.endsWith('> \n') ? ret.substr(0, ret.length - 3) : ret
             case 'STRONG':

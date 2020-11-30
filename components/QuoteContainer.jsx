@@ -66,9 +66,8 @@ module.exports = class QuoteContainer extends React.Component {
             <div className={`${classes.auto} ${classes.scrollerBase} quoteMessages`}>
                 {quotedUsers.map((e, i) => <>
                     {e.props.isGroupStart && i ? <Divider /> : null}
-                    <div className={`modifiedQuote${e.props.isGroupStart ? ' stackedQuote' : ''}`}>
+                    <div className={`modifiedQuote${e.props.isGroupStart ? '' : ' stackedQuote'}`}>
                         {e}
-                        {/* TODO: move it to top (help needed!) */}
                         <div
                             className='removeQuote'
                             onClick={() => {
