@@ -11,7 +11,8 @@ Note: this plugin is not finished (yet)
 #### TODO
 - [ ] Quote full message group (by eg shift + quote button)
 - [ ] Possibility to set more formats than one
-- [ ] Preview before sending message
+- [ ] Option to customize variables (for eg custom time format)
+- [x] Preview before sending message
 - [x] Option to replace @ in mentions
 - [x] Quote only selected text
 - [x] Setting to use QuoteContainer also from context menu button

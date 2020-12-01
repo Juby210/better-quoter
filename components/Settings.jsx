@@ -61,6 +61,10 @@ class Settings extends React.Component {
                 value={getSetting('breakLine', true)}
                 onChange={() => toggleSetting('breakLine', true)}
             >Append a new line to the {getSetting('afterQuote', true) ? 'end' : 'beginning'} of the quote format</SwitchItem>
+            {!classic ? <SwitchItem
+                value={getSetting('rememberPreview')}
+                onChange={() => toggleSetting('rememberPreview')}
+            >Remember preview setting</SwitchItem> : null}
             <SwitchItem
                 value={getSetting('quoteOnlySelected')}
                 onChange={() => toggleSetting('quoteOnlySelected')}

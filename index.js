@@ -88,10 +88,13 @@ module.exports = class BetterQuoter extends Plugin {
 
             if (!res?.props?.children?.props?.children) return res
             const { children } = res.props.children.props
-            children.unshift(React.createElement(QuoteContainer))
+            children.unshift(React.createElement(QuoteContainer, {
+                createQuotes: this.createQuotes.bind(this),
+                settings: { get: this.settings.get.bind(this), set: this.settings.set.bind(this) }
+            }))
             if (quotedUsers.length) {
                 const textArea = findInReactTree(children, e => e?.onScroll)
-                if (textArea) textArea.className += ' ' + classes.hasReply
+                if (textArea && textArea.className.indexOf('hasReply') !== -1) textArea.className += ' ' + classes.hasReply
             }
             return res
         })
@@ -142,7 +145,9 @@ module.exports = class BetterQuoter extends Plugin {
             }, [ forceUpdate ])
 
             if (!res?.props?.className || !quotedUsers.length) return res
-            if (quotedUsers.find(m => m.props.message.id === args[0].message.id)) res.props.className += ' ' + classes.replying
+            if (quotedUsers.find(m => m.props.message.id === args[0].message.id) && res.props.className.indexOf('replying') !== -1) {
+                res.props.className += ' ' + classes.replying
+            }
 
             return res
         })

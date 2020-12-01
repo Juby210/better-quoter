@@ -26,6 +26,12 @@ module.exports = [
         desc: "Used to get the name from the author."
     },
     {
+        selector: "nick",
+        prop: "message.nick",
+        desc: "Used to get the nick or username from the author.",
+        fn: (prop, _, message) => prop || message.author.username
+    },
+    {
         selector: "time",
         prop: "message.timestamp",
         desc: "Used to get the timestamp from the message.",

@@ -11,7 +11,7 @@
     cursor: default;
 }
 
-.modifiedQuote {
+.modifiedQuote, .quotePreview {
     display: grid;
     grid-template-columns: auto min-content;
     padding: 0 6px;
@@ -42,6 +42,10 @@
 .removeQuote:hover {
     --interactive-normal: #f04747;
 }
+
+.quotePreviewActive { color: var(--interactive-active) }
+.quotePreviewActive:hover { color: var(--interactive-hover) }
+.quotePreview code { background: var(--background-secondary-alt) }
 
 
 .quoterPreview img { z-index: 0 }
