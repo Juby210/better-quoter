@@ -1,5 +1,5 @@
 const { Plugin } = require('powercord/entities')
-const { findInReactTree } = require('powercord/util')
+const { findInReactTree, getReactInstance } = require('powercord/util')
 const { getModule, getModuleByDisplayName, messages, FluxDispatcher, React } = require('powercord/webpack')
 const { inject, uninject } = require('powercord/injector')
 
@@ -12,6 +12,7 @@ let quotedUsers = []
 // Below Copied from ZLibrary
 const getProp = (e, t) => t.split('.').reduce((e, p) => e && e[p], e)
 
+const { channelTextArea } = getModule(['channelTextArea', 'chat'], false) || {}
 const { getGuild } = getModule(['getGuild'], false) || {}
 const { getMessage } = getModule(['getMessages'], false) || {}
 
@@ -30,7 +31,13 @@ module.exports = class BetterQuoter extends Plugin {
         })
         this.loadStylesheet('style.css')
 
-        FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', this.subscribe = data => quotedUsers = data.quotedUsers)
+        FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', this.subscribe = data => {
+            this.forceTextAreaUpdate(data.quotedUsers)
+            quotedUsers = data.quotedUsers
+
+            // not always working properly but eh
+            document.querySelectorAll('[id^="chat-messages-"]').forEach(e => getReactInstance(e).memoizedProps.onMouseMove())
+        })
 
         const Message = await getModule(m => m.prototype && m.prototype.getReaction && m.prototype.isSystemDM)
         const ChannelMessage = await getModule(m => m.type && m.type.displayName == 'ChannelMessage')
@@ -52,8 +59,7 @@ module.exports = class BetterQuoter extends Plugin {
 
                             const msg = content !== message.content ? new Message({ ...message, content }) : message
                             if (this.settings.get('classicMode')) return this.insertText(this.createQuote(msg, channel))
-                            quotedUsers.push(React.createElement(ChannelMessage, { message: msg, channel }))
-                            FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE', quotedUsers })
+                            this.updateQuotes([ ...quotedUsers, React.createElement(ChannelMessage, { message: msg, channel }) ])
                         }
                     })
                 )
@@ -72,6 +78,7 @@ module.exports = class BetterQuoter extends Plugin {
         [ 'betterquoter-toolbar', ...this.injections ].forEach(i => uninject(i))
         if (this.subscribe) FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', this.subscribe)
         document.querySelectorAll('.betterQuoterBtn').forEach(e => e.style.display = 'none')
+        this.forceTextAreaUpdate([])
     }
 
     async patch(repatch) {
@@ -83,9 +90,6 @@ module.exports = class BetterQuoter extends Plugin {
         }
         const ChannelTextAreaContainer = await getModule(m => m?.type?.render?.displayName === 'ChannelTextAreaContainer')
         inject('betterquoter-textarea', ChannelTextAreaContainer.type, 'render', (_, res) => {
-            const forceUpdate = React.useState()[1]
-            React.useEffect(this.updater(forceUpdate), [ forceUpdate ])
-
             if (!res?.props?.children?.props?.children) return res
             const { children } = res.props.children.props
             children.unshift(React.createElement(QuoteContainer, {
@@ -137,13 +141,6 @@ module.exports = class BetterQuoter extends Plugin {
 
         const Message = await getModule(m => m.type && (m.__powercordOriginal_type || m.type).toString().indexOf('useContextMenuMessage') !== -1)
         inject('betterquoter-message', Message, 'type', (args, res) => {
-            const forceUpdate = React.useState()[1]
-            React.useEffect(() => {
-                const callback = () => forceUpdate({})
-                FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', callback)
-                return () => FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', callback)
-            }, [ forceUpdate ])
-
             if (!res?.props?.className || !quotedUsers.length) return res
             if (quotedUsers.find(m => m.props.message.id === args[0].message.id) && res.props.className.indexOf('replying') === -1) {
                 res.props.className += ' ' + classes.replying
@@ -154,16 +151,16 @@ module.exports = class BetterQuoter extends Plugin {
         Message.type.toString = () => Message.__powercordOriginal_type.toString()
     }
 
-    updater(forceUpdate) {
-        return () => {
-            const callback = () => forceUpdate({})
-            FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE', callback)
-            FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE2', callback)
-            return () => {
-                FluxDispatcher.subscribe('BETTER_QUOTER_UPDATE', callback)
-                FluxDispatcher.unsubscribe('BETTER_QUOTER_UPDATE2', callback)
-            }
+    forceTextAreaUpdate(newQuotes) {
+        if (!quotedUsers.length && newQuotes.length || quotedUsers.length && !newQuotes.length) {
+            const textArea = document.querySelector(`.${channelTextArea}`)
+            if (textArea) getReactInstance(textArea).memoizedProps.onMouseDown() // hacky force update
         }
+    }
+    updateQuotes(newQuotes) {
+        this.forceTextAreaUpdate(newQuotes)
+        quotedUsers = newQuotes
+        FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE', quotedUsers })
     }
     get quoted() {
         return quotedUsers
@@ -177,8 +174,7 @@ module.exports = class BetterQuoter extends Plugin {
             setTimeout(() => powercord.api.notices.closeToast(`quoterError-${r}`), 4050) // just to make sure
             return false
         }
-        quotedUsers = []
-        FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE', quotedUsers })
+        this.updateQuotes([])
         return ret
     }
     createQuotes(quotes = []) {
