@@ -35,8 +35,7 @@ module.exports = class BetterQuoter extends Plugin {
             this.forceTextAreaUpdate(data.quotedUsers)
             quotedUsers = data.quotedUsers
 
-            // not always working properly but eh
-            document.querySelectorAll('[id^="chat-messages-"]').forEach(e => getReactInstance(e).memoizedProps.onMouseMove())
+            this.forceMessagesUpdate()
         })
 
         const Message = await getModule(m => m.prototype && m.prototype.getReaction && m.prototype.isSystemDM)
@@ -157,6 +156,9 @@ module.exports = class BetterQuoter extends Plugin {
             if (textArea) getReactInstance(textArea).memoizedProps.onMouseDown() // hacky force update
         }
     }
+    forceMessagesUpdate() {
+        document.querySelectorAll('[id^="chat-messages-"]').forEach(e => getReactInstance(e).memoizedProps.onMouseMove())
+    }
     updateQuotes(newQuotes) {
         this.forceTextAreaUpdate(newQuotes)
         quotedUsers = newQuotes
@@ -175,6 +177,7 @@ module.exports = class BetterQuoter extends Plugin {
             return false
         }
         this.updateQuotes([])
+        this.forceMessagesUpdate()
         return ret
     }
     createQuotes(quotes = []) {
