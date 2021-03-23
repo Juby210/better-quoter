@@ -84,13 +84,15 @@ module.exports = class BetterQuoter extends Plugin {
         if (repatch) this.injections.forEach(i => uninject(i))
         if (this.settings.get('classicMode')) return
         const classes = {
-            ...await getModule(['hasReply']),
+            ...await getModule(['hasReply', 'webkit']),
             ...await getModule(['message', 'replying'])
         }
         const ChannelTextAreaContainer = await getModule(m => m?.type?.render?.displayName === 'ChannelTextAreaContainer')
         inject('betterquoter-textarea', ChannelTextAreaContainer.type, 'render', (_, res) => {
-            if (!res?.props?.children?.props?.children) return res
-            const { children } = res.props.children.props
+            const child = res?.props?.children
+            if (!child) return res
+            const children = (Array.isArray(child) ? child[0] : child)?.props?.children
+            if (!children) return res
             children.unshift(React.createElement(QuoteContainer, {
                 createQuotes: this.createQuotes.bind(this),
                 settings: { get: this.settings.get.bind(this), set: this.settings.set.bind(this) }
