@@ -28,7 +28,7 @@ module.exports = class QuoteContainer extends React.Component {
     }
 
     renderHeader(authors) {
-        return <div className={`${classes.container} quoteHeader`}>
+        return <div className={`${classes.container} ${classes.replyBar} quoteHeader`}>
             <div className={`${classes.colorHeaderSecondary} ${classes.size14} ${classes.text}`}>
                 Quoting {authors.reduce((items, item, index, _this) => {
                     const ret = <span class={classes.name} style={{ color: item.color ?? void 0 }}>{item.name}</span>
