@@ -1,5 +1,5 @@
-const { getModule, getModuleByDisplayName, FluxDispatcher, React } = require('powercord/webpack')
-const { Divider, Tooltip } = require('powercord/components')
+const { getModule, FluxDispatcher, React } = require('powercord/webpack')
+const { Divider, Tooltip, Icon } = require('powercord/components')
 
 let quotedUsers = [], preview
 
@@ -11,12 +11,6 @@ const classes = {
     ...getModule(['markup'], false)
 }
 const parser = getModule(['parse', 'parseTopic'], false)
-
-const Icons = {
-    Spoiler: getModule(m => m.displayName === 'Spoiler' && !m.Types, false),
-    CloseCircle: getModuleByDisplayName('CloseCircle', false),
-    Trash: getModuleByDisplayName('Trash', false)
-}
 
 module.exports = class QuoteContainer extends React.Component {
     constructor(props) {
@@ -50,8 +44,7 @@ module.exports = class QuoteContainer extends React.Component {
                     this.forceUpdate()
                 }}>
                     <Tooltip text={preview ? 'Disable preview' : 'Preview'} className={`${classes.closeButton}${preview ? ' quotePreviewActive' : ''}`}>
-                        {/* <Icon name='Spoiler' className={classes.closeIcon} /> */}
-                        <Icons.Spoiler className={classes.closeIcon} />
+                        <Icon name='Spoiler' className={classes.closeIcon} />
                     </Tooltip>
                 </div>
                 <div className={classes.separator} />
@@ -61,8 +54,7 @@ module.exports = class QuoteContainer extends React.Component {
                     this.forceUpdate()
                 }}>
                     <Tooltip text='Close' className={classes.closeButton}>
-                        {/* <Icon name='CloseCircle' className={classes.closeIcon} /> */}
-                        <Icons.CloseCircle className={classes.closeIcon} />
+                        <Icon name='CloseCircle' className={classes.closeIcon} />
                     </Tooltip>
                 </div>
             </div>
@@ -81,7 +73,7 @@ module.exports = class QuoteContainer extends React.Component {
                         FluxDispatcher.dirtyDispatch({ type: 'BETTER_QUOTER_UPDATE2', quotedUsers })
                         this.forceUpdate()
                     }}
-                ><Tooltip position='left' text='Cancel Quoting Message'><Icons.Trash color='var(--interactive-normal)' /></Tooltip></div>
+                ><Tooltip position='left' text='Cancel Quoting Message'><Icon name='Trash' color='var(--interactive-normal)' /></Tooltip></div>
             </div>
         </>)
     }
