@@ -142,9 +142,10 @@ module.exports = class BetterQuoter extends Plugin {
 
         const Message = await getModule(m => m.type && (m.__powercordOriginal_type || m.type).toString().indexOf('useContextMenuMessage') !== -1)
         inject('betterquoter-message', Message, 'type', (args, res) => {
-            if (!res?.props?.className || !quotedUsers.length) return res
-            if (quotedUsers.find(m => m.props.message.id === args[0].message.id) && res.props.className.indexOf('replying') === -1) {
-                res.props.className += ' ' + classes.replying
+            const message = findInReactTree(res, e => e.className)
+            if (!message || !quotedUsers.length) return res
+            if (quotedUsers.find(m => m.props.message.id === args[0].message.id) && message.className.indexOf('replying') === -1) {
+                message.className += ' ' + classes.replying
             }
 
             return res
@@ -159,7 +160,7 @@ module.exports = class BetterQuoter extends Plugin {
         }
     }
     forceMessagesUpdate() {
-        document.querySelectorAll('[id^="chat-messages-"]').forEach(e => getReactInstance(e).memoizedProps.onMouseMove())
+        document.querySelectorAll('[id^="chat-messages-"]').forEach(e => getReactInstance(e).memoizedProps?.children?.props?.onMouseMove?.())
     }
     updateQuotes(newQuotes) {
         this.forceTextAreaUpdate(newQuotes)

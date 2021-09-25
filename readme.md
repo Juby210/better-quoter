@@ -1,12 +1,7 @@
 # BetterQuoter
 The real better quoter for discord. Allows you to quote multiple messages & users at same time across channels or servers or just customize quote format.
 
-Note: this plugin is not finished (yet)
-
-#### Infos
-- This is powercord version of Strencher's (not released yet) BD ["Quoter"](https://github.com/Strencher/BetterDiscordStuff/blob/master/Quoter/Quoter.plugin.js) Plugin. Note that some things are improved or added here.
-- Devs: [Juby210](https://github.com/Juby210) & [Strencher](https://github.com/Strencher)
-- Strencher's [Support Server](https://discord.gg/gvA2ree)
+Note: this plugin is not finished, due to lack of time it will only receive important fixes.
 
 #### TODO
 - [ ] Quote full message group (by eg shift + quote button)
